@@ -6,8 +6,10 @@ import {
   Cloud,
   Code2,
   Database,
+  Download,
   Github,
   GraduationCap,
+  Linkedin,
   Mail,
   MapPin,
   Mic,
@@ -21,6 +23,8 @@ import { AnimatedTetrahedron } from "@/components/landing/animated-tetrahedron";
 import { AnimatedWave } from "@/components/landing/animated-wave";
 import { PortfolioThreeScene } from "@/components/landing/portfolio-three-scene";
 import { ScrollEffects } from "@/components/landing/scroll-effects";
+import { InteractiveAI } from "@/components/landing/interactive-ai";
+import { TrackedLink } from "@/components/tracked-link";
 import { Button } from "@/components/ui/button";
 
 const projects = [
@@ -95,8 +99,10 @@ const experience = [
     org: "EMB Global (Incuspaze), Gurgaon",
     date: "May 2026 - Present",
     points: [
-      "Built full-stack RAG, Text-to-SQL, OCR, and AI interview systems using LangChain, FastAPI, Next.js, ChromaDB, MCP servers, and cloud deployment workflows.",
-      "Designed GCP Cloud Run deployments, GitHub Actions CI/CD, admin dashboards, document ingestion, authentication, and live web-search integrations.",
+      "Led design and delivery of RAG-powered and OCR systems used in production, owning design choices from ingestion to retrieval.",
+      "Built Text-to-SQL tooling and AI interview systems using LangChain, FastAPI, Next.js and ChromaDB to streamline product workflows.",
+      "Designed and templated GCP Cloud Run deployments and GitHub Actions CI/CD pipelines to make deployments repeatable and reliable.",
+      "Worked closely with product managers and QA to reduce incident surface and improve deployment velocity.",
     ],
   },
   {
@@ -104,7 +110,9 @@ const experience = [
     org: "Innovate, Remote",
     date: "Aug 2025 - Oct 2025",
     points: [
-      "Developed predictive modeling for road traffic management with preprocessing, training, evaluation, and visualization on real-world data.",
+      "Built end-to-end predictive models for road traffic using time-series features and spatial encoding, from preprocessing to evaluation.",
+      "Implemented model monitoring and validation pipelines, and visualized results to help operations teams make routing decisions.",
+      "Worked with domain experts to translate model outputs into actionable recommendations for traffic control simulations.",
     ],
   },
   {
@@ -112,7 +120,9 @@ const experience = [
     org: "CloudSphere, Remote",
     date: "May 2025 - Jul 2025",
     points: [
-      "Worked on cloud asset discovery, cost analysis, security assessment, performance monitoring, and optimization reporting.",
+      "Performed cloud asset discovery and created inventory tooling to improve visibility across accounts.",
+      "Ran cost analysis and proposed optimization strategies, including rightsizing and reserved-instance planning.",
+      "Built monitoring dashboards and automated security checks to reduce manual audit effort and improve reliability.",
     ],
   },
   {
@@ -120,7 +130,9 @@ const experience = [
     org: "The Cocoa Counter, New Delhi",
     date: "May 2024 - Jun 2024",
     points: [
-      "Created content calendars, captions, campaign visuals, and customer engagement workflows for social platforms.",
+      "Owned content planning and creation for social platforms, setting up A/B tests for post formats and CTAs.",
+      "Used basic analytics to iterate on messaging and increase engagement during short marketing campaigns.",
+      "Coordinated with design and sales to align content with product promotions and in-store events.",
     ],
   },
 ];
@@ -188,6 +200,14 @@ const certifications = [
 ];
 
 export default function Home() {
+  // Group experience by year (start year) for cleaner timeline grouping
+  const experienceByYear: Record<string, typeof experience> = {};
+  experience.forEach((exp) => {
+    const year = exp.date.split(" ")[1];
+    if (!experienceByYear[year]) experienceByYear[year] = [];
+    experienceByYear[year].push(exp);
+  });
+
   return (
     <main className="relative min-h-screen overflow-x-hidden bg-background text-foreground noise-overlay">
       <ScrollEffects />
@@ -200,6 +220,7 @@ export default function Home() {
             <div className="flex flex-wrap items-center gap-2 text-sm font-medium text-muted-foreground">
               <a className="px-3 py-2 hover:text-foreground" href="#projects">Projects</a>
               <a className="px-3 py-2 hover:text-foreground" href="#experience">Experience</a>
+              <a className="px-3 py-2 hover:text-foreground" href="#skills">Skills</a>
               <a className="hidden px-3 py-2 hover:text-foreground sm:inline" href="#contact">Contact</a>
             </div>
             <a href="#top" className="flex shrink-0 items-center gap-3 border border-foreground/10 bg-background/80 px-3 py-2 font-mono text-sm font-semibold uppercase tracking-[0.18em]">
@@ -213,25 +234,66 @@ export default function Home() {
         <PortfolioThreeScene />
         <div className="relative z-10" data-reveal="slide-right">
           <div className="mb-6 flex flex-wrap gap-2 font-mono text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-            <span className="rounded-full border border-foreground/10 bg-background/70 px-3 py-2 backdrop-blur">Full-stack</span>
-            <span className="rounded-full border border-foreground/10 bg-background/70 px-3 py-2 backdrop-blur">Cloud</span>
-            <span className="rounded-full border border-foreground/10 bg-background/70 px-3 py-2 backdrop-blur">AI</span>
-            <span className="rounded-full border border-foreground/10 bg-background/70 px-3 py-2 backdrop-blur">Data</span>
+            <span className="rounded-full border border-foreground/10 bg-background/70 px-3 py-2 backdrop-blur">AI-powered products</span>
+            <span className="rounded-full border border-foreground/10 bg-background/70 px-3 py-2 backdrop-blur">Cloud-native systems</span>
+            <span className="rounded-full border border-foreground/10 bg-background/70 px-3 py-2 backdrop-blur">Scalable web applications</span>
           </div>
-          <h1 className="max-w-2xl text-3xl font-semibold leading-snug tracking-tight drop-shadow-[0_12px_30px_rgba(255,255,255,0.85)] sm:text-4xl md:text-5xl lg:text-6xl xl:text-6xl">
-            Aryan Saigal — Full-stack, cloud, and AI engineer focused on building practical, product-ready solutions.
+          <h1 className="max-w-2xl text-3xl font-semibold leading-snug tracking-tight drop-shadow-[0_12px_30px_rgba(255,255,255,0.85)] sm:text-4xl md:text-5xl lg:text-6xl">
+            Building AI-powered products, cloud-native systems, and scalable web applications.
           </h1>
+          
           <div className="mt-8 flex flex-wrap gap-3">
             <Button asChild size="lg" className="rounded-none">
-              <a href="#projects">
-                View repositories <ArrowUpRight className="size-4" />
-              </a>
+              <TrackedLink
+                href="/resume.pdf"
+                target="_blank"
+                rel="noreferrer"
+                eventName="resume_download"
+                eventProperties={{ location: "hero" }}
+              >
+                <Download className="size-4" /> Resume
+              </TrackedLink>
             </Button>
             <Button asChild variant="outline" size="lg" className="rounded-none bg-background/70">
-              <a href="#contact">
-                <Mail className="size-4" /> Contact details
+              <TrackedLink
+                href="https://github.com/saigalaryan"
+                target="_blank"
+                rel="noreferrer"
+                eventName="contact_interaction"
+                eventProperties={{ channel: "github", location: "hero" }}
+              >
+                <Github className="size-4" /> GitHub
+              </TrackedLink>
+            </Button>
+            <Button asChild variant="outline" size="lg" className="rounded-none bg-background/70">
+              <TrackedLink
+                href="https://www.linkedin.com/in/aryan-saigal-88644976/"
+                target="_blank"
+                rel="noreferrer"
+                eventName="contact_interaction"
+                eventProperties={{ channel: "linkedin", location: "hero" }}
+              >
+                <Linkedin className="size-4" /> LinkedIn
+              </TrackedLink>
+            </Button>
+            <Button asChild size="lg" className="rounded-none">
+              <a href="#projects">
+                View Projects <ArrowUpRight className="size-4" />
               </a>
             </Button>
+          </div>
+          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              { heading: "3+ internships", detail: "AI & cloud delivery" },
+              { heading: "5+ production systems", detail: "FastAPI, RAG, OCR, dashboards" },
+              { heading: "93% accuracy", detail: "Legal retrieval and intent classification" },
+              { heading: "15+ repos", detail: "Open-source AI, infra, product tooling" },
+            ].map((metric) => (
+              <div key={metric.heading} className="rounded-[1.5rem] border border-foreground/10 bg-card/85 p-5 shadow-[0_20px_60px_rgba(17,17,17,0.08)]">
+                <p className="text-sm font-semibold uppercase tracking-[0.16em] text-muted-foreground">{metric.heading}</p>
+                <p className="mt-3 text-lg font-semibold leading-7">{metric.detail}</p>
+              </div>
+            ))}
           </div>
         </div>
 
@@ -319,19 +381,31 @@ export default function Home() {
             </div>
           </div>
           <Button asChild variant="outline" className="w-fit rounded-none bg-background/70 shadow-[8px_8px_0_rgba(17,17,17,0.08)]">
-            <a href="https://github.com/saigalaryan" target="_blank" rel="noreferrer">
+            <TrackedLink
+              href="https://github.com/saigalaryan"
+              target="_blank"
+              rel="noreferrer"
+              eventName="contact_interaction"
+              eventProperties={{ channel: "github", location: "projects_header" }}
+            >
               <Github className="size-4" /> GitHub profile
-            </a>
+            </TrackedLink>
           </Button>
         </div>
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
           {projects.map((project, index) => (
-            <a
+            <TrackedLink
               key={project.repo}
               href={project.href}
               target="_blank"
               rel="noreferrer"
+              eventName="project_click"
+              eventProperties={{
+                project: project.title,
+                repo: project.repo,
+                position: index + 1,
+              }}
               className="project-card-3d group flex min-h-[340px] flex-col overflow-hidden border border-foreground/10 bg-card/70 p-5 backdrop-blur transition duration-300 hover:border-foreground/30"
               data-reveal="rise"
             >
@@ -349,38 +423,66 @@ export default function Home() {
                   <ArrowUpRight className="size-5 shrink-0 transition group-hover:translate-x-1 group-hover:-translate-y-1" />
                 </div>
               </div>
-            </a>
+            </TrackedLink>
           ))}
         </div>
       </section>
 
-      <section id="experience" className="mx-auto grid w-[min(1180px,calc(100%-24px))] grid-cols-1 gap-8 py-20 lg:grid-cols-[0.75fr_1.25fr]">
-        <div data-reveal="slide-right">
-          <p className="font-mono text-sm font-semibold uppercase tracking-[0.18em] text-muted-foreground">Experience</p>
-          <h2 className="mt-3 text-5xl font-semibold leading-none tracking-tight sm:text-6xl">
-            Trainee architect with hands-on product builds.
+      <section id="experience" className="mx-auto w-[min(1180px,calc(100%-24px))] py-20">
+        <div className="mb-10" data-reveal="slide-right">
+          <p className="font-mono text-sm font-semibold uppercase tracking-[0.18em] text-muted-foreground">Experience Timeline</p>
+          <h2 className="mt-3 text-5xl font-semibold leading-tight tracking-tight sm:text-6xl">
+            Professional milestones and AI/cloud systems experience.
           </h2>
-          <div className="hero-console mt-8 h-80 border border-foreground/10 bg-card/60 shadow-[0_30px_90px_rgba(20,20,20,0.12)]" data-parallax="-0.04">
-            <AnimatedTetrahedron />
-          </div>
         </div>
-        <div className="border border-foreground/10 bg-card/70 shadow-[0_28px_90px_rgba(20,20,20,0.08)] backdrop-blur">
-          {experience.map((item) => (
-            <article key={`${item.role}-${item.org}`} className="grid gap-6 border-b border-foreground/10 p-6 last:border-b-0 md:grid-cols-[180px_1fr]" data-reveal="slide-left">
-              <div>
-                <p className="font-mono text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">{item.date}</p>
-              </div>
-              <div>
-                <h3 className="text-2xl font-semibold tracking-tight">{item.role}</h3>
-                <p className="mt-1 flex items-center gap-2 text-sm font-medium text-muted-foreground">
-                  <MapPin className="size-4" /> {item.org}
-                </p>
-                {item.points.map((point) => (
-                  <p key={point} className="mt-4 leading-7 text-muted-foreground">{point}</p>
+
+        <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr]">
+          <div className="rounded-[2rem] border border-foreground/10 bg-card/90 p-8 shadow-[0_28px_90px_rgba(17,17,17,0.12)]" data-reveal="slide-left">
+            <p className="font-mono text-sm uppercase tracking-[0.16em] text-muted-foreground">Roles</p>
+            <div className="mt-6 space-y-6">
+              {experience.map((exp) => (
+                <div key={exp.role} className="flex gap-4 items-start">
+                  <div className="mt-1 h-2 w-2 rounded-full bg-foreground flex-shrink-0" />
+                  <div>
+                    <p className="font-semibold">{exp.role}</p>
+                    <p className="mt-1 text-sm text-muted-foreground">{exp.org} · <span className="font-mono">{exp.date}</span></p>
+                    <p className="mt-2 text-sm text-muted-foreground">{exp.points[0]}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="rounded-[2rem] border border-foreground/10 bg-card/90 p-8 shadow-[0_28px_90px_rgba(17,17,17,0.12)]" data-reveal="slide-right">
+            <div className="font-mono text-sm uppercase tracking-[0.16em] text-muted-foreground">Timeline</div>
+            <div className="mt-6">
+              {Object.keys(experienceByYear)
+                .sort((a, b) => Number(b) - Number(a))
+                .map((year) => (
+                  <div key={year} className="mb-6">
+                    <p className="mb-4 text-sm font-semibold">{year}</p>
+                    <div className="border-l border-foreground/10 pl-6">
+                      {experienceByYear[year].map((exp) => (
+                        <div key={exp.role} className="mb-6 relative last:mb-0">
+                          <div className="absolute left-[-12px] top-2 h-2 w-2 rounded-full bg-foreground transition-transform duration-200" />
+                          <p className="text-sm uppercase tracking-[0.14em] text-muted-foreground">{exp.date}</p>
+                          <details className="mt-2 [&_summary::-webkit-details-marker]:hidden">
+                            <summary className="cursor-pointer list-none text-xl font-semibold leading-snug transition-transform duration-150 hover:text-foreground">
+                              {exp.role} <span className="ml-2 text-sm text-muted-foreground">— {exp.org}</span>
+                            </summary>
+                            <ul className="mt-2 list-disc ml-5 space-y-1 text-sm text-muted-foreground marker:text-[10px] marker:text-muted-foreground">
+                              {exp.points.map((pt, i) => (
+                                <li key={i} className="text-sm leading-5">{pt}</li>
+                              ))}
+                            </ul>
+                          </details>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 ))}
-              </div>
-            </article>
-          ))}
+            </div>
+          </div>
         </div>
       </section>
 
@@ -408,7 +510,11 @@ export default function Home() {
               <p className="text-xl font-semibold">B.Tech, Computer Science & Engineering</p>
               <p className="mt-1 text-muted-foreground">Amity University, Noida · 2022 - 2026</p>
             </div>
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+              <div className="border border-foreground/10 p-4">
+                <p className="font-mono text-2xl font-semibold">7.2</p>
+                <p className="mt-1 text-sm text-muted-foreground">College CGPA</p>
+              </div>
               <div className="border border-foreground/10 p-4">
                 <p className="font-mono text-2xl font-semibold">91%</p>
                 <p className="mt-1 text-sm text-muted-foreground">Class XII, CBSE</p>
@@ -416,6 +522,69 @@ export default function Home() {
               <div className="border border-foreground/10 p-4">
                 <p className="font-mono text-2xl font-semibold">85%</p>
                 <p className="mt-1 text-sm text-muted-foreground">Class X, CBSE</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="hire-me" className="mx-auto w-[min(1180px,calc(100%-24px))] py-20">
+        <div className="mb-10" data-reveal="slide-right">
+          <h2 className="text-5xl font-semibold leading-tight tracking-tight sm:text-6xl">
+            Why hire me and what I am building now.
+          </h2>
+        </div>
+
+        <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+          <div className="grid gap-6">
+            <div className="rounded-[2rem] border border-foreground/10 bg-card/90 p-8 shadow-[0_28px_90px_rgba(17,17,17,0.12)]" data-reveal="slide-right">
+              <p className="font-mono text-sm font-semibold uppercase tracking-[0.18em] text-muted-foreground">Why Hire Me</p>
+              <div className="mt-8 grid gap-3 sm:grid-cols-2">
+                {[
+                  "AI Development",
+                  "Cloud Deployment",
+                  "Solution Architecture",
+                  "Full-Stack Development",
+                  "Fast Learner",
+                  "Product Thinking",
+                ].map((item) => (
+                  <div key={item} className="rounded-3xl border border-foreground/10 bg-background/70 p-4 text-sm font-semibold text-foreground">
+                    {item}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="rounded-[2rem] border border-foreground/10 bg-card/90 p-8 shadow-[0_28px_90px_rgba(17,17,17,0.12)]" data-reveal="slide-left">
+              <p className="font-mono text-sm font-semibold uppercase tracking-[0.18em] text-muted-foreground">Currently Building</p>
+              <div className="mt-6 space-y-3 text-sm text-muted-foreground">
+                {[
+                  "AI Agents",
+                  "RAG Systems",
+                  "Cloud Deployments",
+                  "QA Testing Frameworks",
+                ].map((item) => (
+                  <div key={item} className="rounded-3xl border border-foreground/10 bg-background/70 p-4 font-semibold text-foreground">
+                    {item}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="grid gap-6">
+            <div className="rounded-[2rem] border border-foreground/10 bg-card/90 p-8 shadow-[0_28px_90px_rgba(17,17,17,0.12)]" data-reveal="slide-left">
+              <p className="font-mono text-sm font-semibold uppercase tracking-[0.18em] text-muted-foreground">Testimonial</p>
+              <p className="mt-4 text-3xl font-semibold leading-tight tracking-tight">
+                “Aryan consistently delivered high-quality solutions and showed strong ownership."
+              </p>
+              <p className="mt-6 text-sm text-muted-foreground">— Abhay, Manager at EMB</p>
+            </div>
+
+            <div className="rounded-[2rem] border border-foreground/10 bg-card/90 p-8 shadow-[0_28px_90px_rgba(17,17,17,0.12)]" data-reveal="rise">
+              <p className="font-mono text-sm font-semibold uppercase tracking-[0.18em] text-muted-foreground">Interactive AI features</p>
+              <div className="mt-6">
+                <InteractiveAI />
               </div>
             </div>
           </div>
@@ -474,14 +643,33 @@ export default function Home() {
             </div>
             <div className="flex flex-col gap-3">
               <Button asChild variant="secondary" size="lg" className="rounded-none">
-                <a href="mailto:saigalaryan03@gmail.com">
+                <TrackedLink
+                  href="mailto:saigalaryan03@gmail.com"
+                  eventName="contact_interaction"
+                  eventProperties={{ channel: "email", location: "contact" }}
+                >
                   <Mail className="size-4" /> saigalaryan03@gmail.com
-                </a>
+                </TrackedLink>
+              </Button>
+              <Button asChild variant="outline" size="lg" className="rounded-none bg-background/70">
+                <TrackedLink
+                  href="https://www.linkedin.com/in/aryan-saigal-88644976/"
+                  target="_blank"
+                  rel="noreferrer"
+                  eventName="contact_interaction"
+                  eventProperties={{ channel: "linkedin", location: "contact" }}
+                >
+                  <Linkedin className="size-4" /> LinkedIn
+                </TrackedLink>
               </Button>
               <Button asChild variant="outline" size="lg" className="rounded-none border-background/20 bg-transparent text-background hover:bg-background hover:text-foreground">
-                <a href="tel:+919810807911">
+                <TrackedLink
+                  href="tel:+919810807911"
+                  eventName="contact_interaction"
+                  eventProperties={{ channel: "phone", location: "contact" }}
+                >
                   <Phone className="size-4" /> +91 98108 07911
-                </a>
+                </TrackedLink>
               </Button>
             </div>
           </div>
