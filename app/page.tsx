@@ -38,6 +38,15 @@ const projects = [
       "RAG-based legal chatbot that simplifies IPC sections, FIR procedures, and cyber laws across Indian languages.",
   },
   {
+    title: "Conversage AI Assistant Platform",
+    repo: "conversage-ai",
+    href: "https://github.com/saigalaryan/conversage-ai",
+    icon: BrainCircuit,
+    stack: "Python, RAG, file intelligence, persistent memory, tool integrations",
+    summary:
+      "Full-stack AI assistant platform with RAG, file intelligence, persistent memory, diagram generation, and tool integrations.",
+  },
+  {
     title: "OCR Multi-Model Parser Platform",
     repo: "ocr-parse-extract",
     href: "https://github.com/saigalaryan/ocr-parse-extract",
@@ -287,7 +296,7 @@ export default function Home() {
               { heading: "3+ internships", detail: "AI & cloud delivery" },
               { heading: "5+ production systems", detail: "FastAPI, RAG, OCR, dashboards" },
               { heading: "93% accuracy", detail: "Legal retrieval and intent classification" },
-              { heading: "15+ repos", detail: "Open-source AI, infra, product tooling" },
+              { heading: "8 public repos", detail: "Open-source AI, infra, product tooling" },
             ].map((metric) => (
               <div key={metric.heading} className="rounded-[1.5rem] border border-foreground/10 bg-card/85 p-5 shadow-[0_20px_60px_rgba(17,17,17,0.08)]">
                 <p className="text-sm font-semibold uppercase tracking-[0.16em] text-muted-foreground">{metric.heading}</p>
