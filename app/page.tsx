@@ -218,7 +218,7 @@ export default function Home() {
             <span className="rounded-full border border-foreground/10 bg-background/70 px-3 py-2 backdrop-blur">AI</span>
             <span className="rounded-full border border-foreground/10 bg-background/70 px-3 py-2 backdrop-blur">Data</span>
           </div>
-          <h1 className="max-w-3xl text-4xl font-semibold leading-tight tracking-tight drop-shadow-[0_12px_30px_rgba(255,255,255,0.85)] sm:text-5xl lg:text-6xl xl:text-7xl">
+          <h1 className="max-w-2xl text-3xl font-semibold leading-snug tracking-tight drop-shadow-[0_12px_30px_rgba(255,255,255,0.85)] sm:text-4xl md:text-5xl lg:text-6xl xl:text-6xl">
             Aryan Saigal — Full-stack, cloud, and AI engineer focused on building practical, product-ready solutions.
           </h1>
           <div className="mt-8 flex flex-wrap gap-3">
