@@ -38,13 +38,13 @@ const projects = [
       "RAG-based legal chatbot that simplifies IPC sections, FIR procedures, and cyber laws across Indian languages.",
   },
   {
-    title: "Conversage AI Assistant Platform",
+    title: "Conversage AI - RAG Chatbot Suite",
     repo: "conversage-ai",
     href: "https://github.com/saigalaryan/conversage-ai",
     icon: BrainCircuit,
-    stack: "Python, RAG, file intelligence, persistent memory, tool integrations",
+    stack: "Python, RAG, file intelligence, persistent memory, media and tool integrations",
     summary:
-      "Full-stack AI assistant platform with RAG, file intelligence, persistent memory, diagram generation, and tool integrations.",
+      "Full-stack RAG assistant suite with document intelligence, persistent memory, blog and media generation, diagrams, and tool integrations.",
   },
   {
     title: "OCR Multi-Model Parser Platform",
@@ -90,15 +90,6 @@ const projects = [
     stack: "FastAPI, LangChain, SQL, Next.js",
     summary:
       "Natural-language interface that generates SQL, executes backend queries, and explains results in plain language.",
-  },
-  {
-    title: "RAG Chatbot - AI Marketing Suite",
-    repo: "RAG-based-chatbot",
-    href: "https://github.com/saigalaryan/RAG-based-chatbot",
-    icon: BrainCircuit,
-    stack: "LangChain, FastAPI, Next.js, ChromaDB, MCP",
-    summary:
-      "Production-style RAG app with document ingestion, blog generation, media generation, web search, and auth.",
   },
 ];
 

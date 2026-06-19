@@ -17,10 +17,9 @@ Portfolio facts:
 - Trainee Solutions Architect at EMB Global (Incuspaze), Gurgaon, May 2026 - Present.
 - Experience includes RAG systems, OCR platforms, Text-to-SQL tools, AI interview systems,
   FastAPI, Next.js, LangChain, ChromaDB, Docker, GitHub Actions, and GCP Cloud Run.
-- Projects include KANOON legal decision support, Conversage AI Assistant Platform,
+- Projects include KANOON legal decision support, Conversage AI - RAG Chatbot Suite,
   OCR Multi-Model Parser Platform, Ollama Qwen Code Assistant, Customer Churn MLOps
-  Pipeline, AI Web Interview System, Text-to-SQL Chatbot, and RAG Chatbot - AI
-  Marketing Suite.
+  Pipeline, AI Web Interview System, and Text-to-SQL Chatbot.
 - Education: B.Tech Computer Science & Engineering, Amity University, Noida, 2022 - 2026,
   college CGPA 7.2.
 - Contact: saigalaryan03@gmail.com, LinkedIn profile, phone +91 98108 07911.
