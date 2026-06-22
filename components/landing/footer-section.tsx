@@ -33,6 +33,7 @@ const socialLinks = [
   { name: "Twitter", href: "#" },
   { name: "GitHub", href: "https://github.com/saigalaryan" },
   { name: "LinkedIn", href: "https://www.linkedin.com/in/aryan-saigal-88644976/" },
+  { name: "LeetCode", href: "https://leetcode.com/u/saigalaryan/" },
 ];
 
 export function FooterSection() {

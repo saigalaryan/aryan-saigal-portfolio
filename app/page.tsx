@@ -96,7 +96,7 @@ const projects = [
 const experience = [
   {
     role: "Trainee Solutions Architect",
-    org: "EMB Global (Incuspaze), Gurgaon",
+    org: "EMB Global, Gurgaon",
     date: "May 2026 - Present",
     points: [
       "Led design and delivery of RAG-powered and OCR systems used in production, owning design choices from ingestion to retrieval.",
@@ -117,7 +117,7 @@ const experience = [
   },
   {
     role: "Cloud Infrastructure Intern",
-    org: "CloudSphere, Remote",
+    org: "CloudSphere, Noida",
     date: "May 2025 - Jul 2025",
     points: [
       "Performed cloud asset discovery and created inventory tooling to improve visibility across accounts.",
@@ -276,6 +276,17 @@ export default function Home() {
                 <Linkedin className="size-4" /> LinkedIn
               </TrackedLink>
             </Button>
+            <Button asChild variant="outline" size="lg" className="rounded-none bg-background/70">
+              <TrackedLink
+                href="https://leetcode.com/u/saigalaryan/"
+                target="_blank"
+                rel="noreferrer"
+                eventName="contact_interaction"
+                eventProperties={{ channel: "leetcode", location: "hero" }}
+              >
+                <Code2 className="size-4" /> LeetCode
+              </TrackedLink>
+            </Button>
             <Button asChild size="lg" className="rounded-none">
               <a href="#projects">
                 View Projects <ArrowUpRight className="size-4" />
@@ -380,17 +391,30 @@ export default function Home() {
               </div>
             </div>
           </div>
-          <Button asChild variant="outline" className="w-fit rounded-none bg-background/70 shadow-[8px_8px_0_rgba(17,17,17,0.08)]">
-            <TrackedLink
-              href="https://github.com/saigalaryan"
-              target="_blank"
-              rel="noreferrer"
-              eventName="contact_interaction"
-              eventProperties={{ channel: "github", location: "projects_header" }}
-            >
-              <Github className="size-4" /> GitHub profile
-            </TrackedLink>
-          </Button>
+          <div className="flex flex-wrap gap-3">
+            <Button asChild variant="outline" className="w-fit rounded-none bg-background/70 shadow-[8px_8px_0_rgba(17,17,17,0.08)]">
+              <TrackedLink
+                href="https://github.com/saigalaryan"
+                target="_blank"
+                rel="noreferrer"
+                eventName="contact_interaction"
+                eventProperties={{ channel: "github", location: "projects_header" }}
+              >
+                <Github className="size-4" /> GitHub profile
+              </TrackedLink>
+            </Button>
+            <Button asChild variant="outline" className="w-fit rounded-none bg-background/70 shadow-[8px_8px_0_rgba(17,17,17,0.08)]">
+              <TrackedLink
+                href="https://leetcode.com/u/saigalaryan/"
+                target="_blank"
+                rel="noreferrer"
+                eventName="contact_interaction"
+                eventProperties={{ channel: "leetcode", location: "projects_header" }}
+              >
+                <Code2 className="size-4" /> LeetCode profile
+              </TrackedLink>
+            </Button>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
@@ -660,6 +684,17 @@ export default function Home() {
                   eventProperties={{ channel: "linkedin", location: "contact" }}
                 >
                   <Linkedin className="size-4" /> LinkedIn
+                </TrackedLink>
+              </Button>
+              <Button asChild variant="outline" size="lg" className="rounded-none bg-background/70">
+                <TrackedLink
+                  href="https://leetcode.com/u/saigalaryan/"
+                  target="_blank"
+                  rel="noreferrer"
+                  eventName="contact_interaction"
+                  eventProperties={{ channel: "leetcode", location: "contact" }}
+                >
+                  <Code2 className="size-4" /> LeetCode
                 </TrackedLink>
               </Button>
               <Button asChild variant="outline" size="lg" className="rounded-none border-background/20 bg-transparent text-background hover:bg-background hover:text-foreground">

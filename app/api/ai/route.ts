@@ -14,7 +14,8 @@ the answer back to Aryan's AI, cloud, full-stack, data, and product engineering 
 
 Portfolio facts:
 - Aryan Saigal builds AI-powered products, cloud-native systems, and scalable web applications.
-- Trainee Solutions Architect at EMB Global (Incuspaze), Gurgaon, May 2026 - Present.
+- Trainee Solutions Architect at EMB Global, Gurgaon, May 2026 - Present.
+- Cloud Infrastructure Intern at CloudSphere, Noida, May 2025 - Jul 2025.
 - Experience includes RAG systems, OCR platforms, Text-to-SQL tools, AI interview systems,
   FastAPI, Next.js, LangChain, ChromaDB, Docker, GitHub Actions, and GCP Cloud Run.
 - Projects include KANOON legal decision support, Conversage AI - RAG Chatbot Suite,
@@ -22,7 +23,7 @@ Portfolio facts:
   Pipeline, AI Web Interview System, and Text-to-SQL Chatbot.
 - Education: B.Tech Computer Science & Engineering, Amity University, Noida, 2022 - 2026,
   college CGPA 7.2.
-- Contact: saigalaryan03@gmail.com, LinkedIn profile, phone +91 98108 07911.
+- Contact: saigalaryan03@gmail.com, LinkedIn profile, LeetCode profile at https://leetcode.com/u/saigalaryan/, phone +91 98108 07911.
 `;
 
 export async function POST(req: Request) {
@@ -32,7 +33,7 @@ export async function POST(req: Request) {
 
     const geminiKey = process.env.GEMINI_API_KEY;
     if (!geminiKey) {
-      return NextResponse.json({ error: "Server not configured: set GEMINI_API_KEY in environment" }, { status: 501 });
+      return NextResponse.json({ error: "AI chat is not configured yet." }, { status: 501 });
     }
 
     let lastError = "";
@@ -68,7 +69,7 @@ export async function POST(req: Request) {
           continue;
         }
 
-        return NextResponse.json({ error: lastError || "Gemini error" }, { status: res.status });
+        return NextResponse.json({ error: lastError || "AI service error" }, { status: res.status });
       }
 
       const data = await res.json();
@@ -85,7 +86,7 @@ export async function POST(req: Request) {
     }
 
     return NextResponse.json(
-      { error: lastError || "Gemini is temporarily unavailable. Please try again shortly." },
+      { error: lastError || "AI chat is temporarily unavailable. Please try again shortly." },
       { status: 503 },
     );
   } catch (err) {
