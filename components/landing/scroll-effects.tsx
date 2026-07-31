@@ -4,9 +4,9 @@ import { useEffect } from "react";
 
 export function ScrollEffects() {
   useEffect(() => {
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
     const revealItems = Array.from(document.querySelectorAll<HTMLElement>("[data-reveal]"));
-    const parallaxItems = Array.from(document.querySelectorAll<HTMLElement>("[data-parallax]"));
-    const scrollSections = Array.from(document.querySelectorAll<HTMLElement>("main > section"));
     const loadFrame = window.requestAnimationFrame(() => {
       document.body.classList.add("is-page-loaded");
     });
@@ -14,52 +14,89 @@ export function ScrollEffects() {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          entry.target.classList.toggle("is-visible", entry.intersectionRatio >= 0.1);
+          if (entry.intersectionRatio < 0.1) return;
+          entry.target.classList.add("is-visible");
+          // will-change pins a compositor layer for as long as it is set.
+          // Release it once the reveal has played and stop observing, so
+          // dozens of layers are not kept alive for the whole session.
+          (entry.target as HTMLElement).style.willChange = "auto";
+          observer.unobserve(entry.target);
         });
       },
-      {
-        threshold: [0.1],
-        rootMargin: "0px 0px -18% 0px",
-      },
+      // A full viewport of lead time in each direction. The reveal then
+      // finishes before the element is actually scrolled to, so content is
+      // already painted when you arrive at it. Triggering close to the
+      // viewport made the page feel like it was rendering slowly.
+      { threshold: 0, rootMargin: "900px 0px 900px 0px" },
     );
 
     revealItems.forEach((item, index) => {
-      item.style.setProperty("--reveal-delay", `${Math.min(index % 5, 4) * 24}ms`);
+      // Short stagger only. A long one compounds with the transition and
+      // leaves later items visibly lagging behind the scroll.
+      item.style.setProperty("--reveal-delay", `${Math.min(index % 3, 2) * 28}ms`);
       observer.observe(item);
     });
 
+    if (reduceMotion) {
+      return () => {
+        observer.disconnect();
+        window.cancelAnimationFrame(loadFrame);
+      };
+    }
+
+    const parallaxItems = Array.from(document.querySelectorAll<HTMLElement>("[data-parallax]"));
+    const scrollSections = Array.from(document.querySelectorAll<HTMLElement>("main > section"));
+
     let frame = 0;
-    let wheelFrame = 0;
     let wheelClear = 0;
     let lastScrollY = window.scrollY;
+    let lastDirection = 0;
 
     const updateParallax = () => {
       frame = 0;
       const scrollY = window.scrollY;
       const direction = scrollY >= lastScrollY ? 1 : -1;
-      document.documentElement.style.setProperty("--scroll-direction", `${direction}`);
-      document.body.classList.toggle("scrolling-down", direction === 1);
-      document.body.classList.toggle("scrolling-up", direction === -1);
       lastScrollY = scrollY;
+
+      // Mutating classes on <body> invalidates style for the entire
+      // document, so only touch them when the direction actually flips
+      // rather than on every frame.
+      if (direction !== lastDirection) {
+        lastDirection = direction;
+        document.documentElement.style.setProperty("--scroll-direction", `${direction}`);
+        document.body.classList.toggle("scrolling-down", direction === 1);
+        document.body.classList.toggle("scrolling-up", direction === -1);
+      }
+
+      const viewportHeight = window.innerHeight;
+      const viewportCenter = viewportHeight / 2;
+
+      // Read every rect first, then write every style. Interleaving reads
+      // and writes forced a synchronous layout per section, per frame.
+      const metrics = scrollSections.map((section) => {
+        const rect = section.getBoundingClientRect();
+        const sectionCenter = rect.top + rect.height / 2;
+        return {
+          focus: Math.max(
+            0,
+            1 - Math.abs(sectionCenter - viewportCenter) / (viewportHeight * 0.72),
+          ),
+          progress: (viewportCenter - sectionCenter) / viewportHeight,
+        };
+      });
 
       parallaxItems.forEach((item) => {
         const speed = Number(item.dataset.parallax || 0.08);
-        item.style.setProperty("--scroll-shift", `${scrollY * speed}px`);
+        item.style.setProperty("--scroll-shift", `${(scrollY * speed).toFixed(2)}px`);
       });
 
-      scrollSections.forEach((section) => {
-        const rect = section.getBoundingClientRect();
-        const viewportCenter = window.innerHeight / 2;
-        const sectionCenter = rect.top + rect.height / 2;
-        const distance = Math.abs(sectionCenter - viewportCenter);
-        const focus = Math.max(0, 1 - distance / (window.innerHeight * 0.72));
-        const progress = (viewportCenter - sectionCenter) / window.innerHeight;
-        section.style.setProperty("--section-focus", focus.toFixed(3));
-        section.style.setProperty("--section-progress", progress.toFixed(3));
+      scrollSections.forEach((section, index) => {
+        section.style.setProperty("--section-focus", metrics[index].focus.toFixed(3));
+        section.style.setProperty("--section-progress", metrics[index].progress.toFixed(3));
       });
     };
 
-    const onScroll = () => {
+    const schedule = () => {
       if (frame) return;
       frame = window.requestAnimationFrame(updateParallax);
     };
@@ -71,8 +108,10 @@ export function ScrollEffects() {
       document.documentElement.style.setProperty("--wheel-intensity", intensity.toFixed(3));
       document.body.classList.add("is-wheel-scrolling");
 
-      if (wheelFrame) window.cancelAnimationFrame(wheelFrame);
-      wheelFrame = window.requestAnimationFrame(updateParallax);
+      // Share the rAF guard. The old code cancelled and re-queued on every
+      // wheel event, which fires faster than rAF and so ran extra full
+      // reflow passes per frame.
+      schedule();
 
       window.clearTimeout(wheelClear);
       wheelClear = window.setTimeout(() => {
@@ -82,15 +121,14 @@ export function ScrollEffects() {
     };
 
     updateParallax();
-    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("scroll", schedule, { passive: true });
     window.addEventListener("wheel", onWheel, { passive: true });
 
     return () => {
       observer.disconnect();
-      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("scroll", schedule);
       window.removeEventListener("wheel", onWheel);
       if (frame) window.cancelAnimationFrame(frame);
-      if (wheelFrame) window.cancelAnimationFrame(wheelFrame);
       window.cancelAnimationFrame(loadFrame);
       window.clearTimeout(wheelClear);
     };
