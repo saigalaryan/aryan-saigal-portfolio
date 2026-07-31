@@ -28,7 +28,19 @@
   --chart-3: oklch(0.55 0.02 60);
   --chart-4: oklch(0.70 0.02 60);
   --chart-5: oklch(0.85 0.01 60);
+  /* Sharp editorial direction: surfaces and buttons are square, only true
+     dots are round. --radius stays small for inputs and focus targets. */
   --radius: 0.25rem;
+
+  /* Signature accent. Previously only existed inside the WebGL scene, so the
+     UI had no visible accent at all. */
+  --lime: #d7ff66;
+  --lime-deep: #b8e034;
+
+  /* Three elevation steps replace twelve near-identical one-off shadows. */
+  --shadow-card: 0 18px 60px rgba(17, 17, 17, 0.09);
+  --shadow-raised: 0 32px 100px rgba(17, 17, 17, 0.14);
+  --shadow-hard: 8px 8px 0 rgba(17, 17, 17, 0.1);
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
   --sidebar-primary: oklch(0.205 0 0);
@@ -37,6 +49,40 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+}
+
+/* Dark palette. Kept warm rather than pure neutral so it reads as the same
+   brand as the cream light theme, not a different site. */
+.dark {
+  --background: oklch(0.17 0.008 70);
+  --foreground: oklch(0.94 0.006 85);
+  --card: oklch(0.21 0.009 70);
+  --card-foreground: oklch(0.94 0.006 85);
+  --popover: oklch(0.21 0.009 70);
+  --popover-foreground: oklch(0.94 0.006 85);
+  --primary: oklch(0.94 0.006 85);
+  --primary-foreground: oklch(0.17 0.008 70);
+  --secondary: oklch(0.26 0.01 70);
+  --secondary-foreground: oklch(0.94 0.006 85);
+  --muted: oklch(0.26 0.01 70);
+  --muted-foreground: oklch(0.70 0.012 80);
+  --accent: oklch(0.30 0.012 70);
+  --accent-foreground: oklch(0.94 0.006 85);
+  --destructive: oklch(0.62 0.20 25);
+  --destructive-foreground: oklch(0.96 0.01 85);
+  --border: oklch(0.32 0.01 70);
+  --input: oklch(0.32 0.01 70);
+  --ring: oklch(0.80 0.01 85);
+
+  /* The lime reads hot on a dark ground, so it is dialled back slightly. */
+  --lime: #c9f25a;
+  --lime-deep: #d7ff66;
+
+  /* Shadows do almost nothing on dark surfaces; borders carry separation
+     instead, so these are deepened rather than tinted. */
+  --shadow-card: 0 18px 60px rgba(0, 0, 0, 0.45);
+  --shadow-raised: 0 32px 100px rgba(0, 0, 0, 0.6);
+  --shadow-hard: 8px 8px 0 rgba(0, 0, 0, 0.5);
 }
 
 @theme inline {
@@ -97,6 +143,70 @@
   .font-display {
     font-family: var(--font-display);
   }
+
+  /* Elevation tokens. Use these instead of bespoke shadow-[...] values. */
+  .shadow-card {
+    box-shadow: var(--shadow-card);
+  }
+
+  .shadow-raised {
+    box-shadow: var(--shadow-raised);
+  }
+
+  .shadow-hard {
+    box-shadow: var(--shadow-hard);
+  }
+
+  .accent-rule {
+    background: var(--lime);
+  }
+
+  /* Page backdrop and grid. Both were hardcoded cream inline, which meant
+     dark mode showed a cream sheet behind dark content. */
+  .page-backdrop {
+    background: linear-gradient(120deg, #f7f4ec 0%, #edf4ec 42%, #f9f0df 100%);
+  }
+
+  .dark .page-backdrop {
+    background: linear-gradient(120deg, #17150f 0%, #131711 42%, #1a1610 100%);
+  }
+
+  .page-grid {
+    background-image:
+      linear-gradient(rgba(17, 17, 17, 0.045) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(17, 17, 17, 0.045) 1px, transparent 1px);
+    background-size: 64px 64px;
+    mask-image: linear-gradient(to bottom, black, transparent 82%);
+  }
+
+  .dark .page-grid {
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  }
+
+  /* Nav underline that grows from the left on hover/focus. */
+  .nav-link {
+    position: relative;
+  }
+
+  .nav-link::after {
+    content: "";
+    position: absolute;
+    left: 0.75rem;
+    right: 0.75rem;
+    bottom: 0.35rem;
+    height: 2px;
+    background: var(--lime-deep);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .nav-link:hover::after,
+  .nav-link:focus-visible::after {
+    transform: scaleX(1);
+  }
   
   .text-stroke {
     -webkit-text-stroke: 1.5px currentColor;
@@ -105,6 +215,22 @@
   
   .marquee {
     animation: marquee 30s linear infinite;
+  }
+
+  /* Edge-faded, pausable marquee track. The strip is duplicated in the markup
+     and shifts by -50%, so the loop is seamless. */
+  .marquee-rail {
+    mask-image: linear-gradient(90deg, transparent, black 8%, black 92%, transparent);
+  }
+
+  .marquee-rail:hover .marquee {
+    animation-play-state: paused;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .marquee {
+      animation: none;
+    }
   }
   
   .marquee-reverse {
@@ -173,7 +299,10 @@
   
   .noise-overlay::after {
     content: '';
-    position: absolute;
+    /* Fixed, not absolute: absolute stretched this SVG turbulence layer over
+       the full ~6000px document height and had to rasterise all of it. Fixed
+       keeps it viewport-sized, and uniform noise looks the same either way. */
+    position: fixed;
     inset: 0;
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
     opacity: 0.03;
@@ -194,21 +323,34 @@
     animation: console-float 6s ease-in-out infinite;
   }
 
-  header {
+  /* The header is `fixed inset-x-0`, i.e. full viewport width, so it must not
+     be translated on X. The old -50% here was left over from a centred
+     `left-1/2` header and shifted the whole nav half a screen off-canvas. */
+  .js .site-header {
     opacity: 0;
-    transform: translate(-50%, -8px);
+    transform: translateY(-8px);
   }
 
-  body.is-page-loaded header {
+  body.is-page-loaded .site-header {
     opacity: 1;
-    transform: translate(-50%, 0) scale(1);
+    transform: translateY(0);
     transition: opacity 360ms ease, transform 360ms cubic-bezier(0.22, 1, 0.36, 1);
   }
 
-  body:not(.is-page-loaded) #top h1,
-  body:not(.is-page-loaded) #top p,
-  body:not(.is-page-loaded) #top .font-mono,
-  body:not(.is-page-loaded) #top a {
+  /* The h1 is deliberately NOT faded from opacity 0.
+     Largest Contentful Paint ignores zero-opacity elements, so hiding the
+     headline until JS added `is-page-loaded` disqualified the real LCP
+     candidate and pushed the metric out to ~2.9s. It now animates on
+     transform only, which keeps it paintable immediately. */
+  .js body:not(.is-page-loaded) #top h1 {
+    transform: translateY(14px);
+  }
+
+  /* Every selector below is `.js`-guarded so a non-JS client is never left
+     with a permanently invisible hero. */
+  .js body:not(.is-page-loaded) #top p,
+  .js body:not(.is-page-loaded) #top .font-mono,
+  .js body:not(.is-page-loaded) #top a {
     opacity: 0;
     transform: translateY(18px);
   }
@@ -222,10 +364,6 @@
     transition: opacity 340ms ease, transform 340ms cubic-bezier(0.22, 1, 0.36, 1);
   }
 
-  body.is-page-loaded #top h1 {
-    transition-delay: 60ms;
-  }
-
   body.is-page-loaded #top p {
     transition-delay: 120ms;
   }
@@ -234,7 +372,7 @@
     transition-delay: 170ms;
   }
 
-  body:not(.is-page-loaded) .hero-console {
+  .js body:not(.is-page-loaded) .hero-console {
     opacity: 0;
     transform: perspective(1000px) translateY(26px) rotateX(7deg) scale(0.96);
   }
@@ -269,59 +407,61 @@
     opacity: calc(var(--section-focus) * 0.18);
     background: radial-gradient(circle at 50% 50%, rgba(17, 17, 17, 0.18), transparent 58%);
     transform: translateY(calc(var(--section-progress) * 34px)) scale(calc(0.94 + var(--section-focus) * 0.08));
-    transition: opacity 110ms linear, transform 110ms linear;
+    /* No transition here on purpose: --section-focus/--section-progress are
+       rewritten every animation frame, so a transition would restart
+       constantly and repaint this large gradient layer each time. */
   }
 
-  [data-reveal] {
+  /* 700ms plus a stagger meant content was still fading in after you had
+     scrolled to it. The blur is dropped too: it made text look unrendered
+     and is the most expensive part of the effect to composite. */
+  .js [data-reveal] {
     opacity: 0;
-    filter: blur(2px);
     transition:
-      opacity 700ms cubic-bezier(0.22, 0.82, 0.28, 1) var(--reveal-delay, 0ms),
-      filter 700ms cubic-bezier(0.22, 0.82, 0.28, 1) var(--reveal-delay, 0ms),
-      transform 700ms cubic-bezier(0.22, 0.82, 0.28, 1) var(--reveal-delay, 0ms);
-    will-change: opacity, transform, filter;
+      opacity 380ms cubic-bezier(0.22, 0.82, 0.28, 1) var(--reveal-delay, 0ms),
+      transform 380ms cubic-bezier(0.22, 0.82, 0.28, 1) var(--reveal-delay, 0ms);
+    /* Only hinted while still waiting to reveal. ScrollEffects resets this
+       to `auto` once the reveal plays, so we do not keep a compositor layer
+       alive for every animated element for the whole session. */
+    will-change: opacity, transform;
   }
 
-  [data-reveal="rise"] {
+  .js [data-reveal="rise"] {
     transform: translateY(20px);
   }
 
-  [data-reveal="slide-right"] {
+  .js [data-reveal="slide-right"] {
     transform: translateX(-20px);
   }
 
-  [data-reveal="slide-left"] {
+  .js [data-reveal="slide-left"] {
     transform: translateX(20px);
   }
 
-  [data-reveal="zoom"] {
+  .js [data-reveal="zoom"] {
     transform: perspective(900px) translateY(14px) rotateX(1.2deg) scale(0.99);
   }
 
   [data-reveal].is-visible {
     opacity: 1;
-    filter: blur(0);
     transform: translate3d(0, 0, 0) rotateX(0deg) rotateY(0deg) scale(1);
-    animation: reveal-entrance 700ms cubic-bezier(0.22, 0.82, 0.28, 1) var(--reveal-delay, 0ms) both;
+    animation: reveal-entrance 380ms cubic-bezier(0.22, 0.82, 0.28, 1) var(--reveal-delay, 0ms) both;
   }
 
   @keyframes reveal-entrance {
     from {
       opacity: 0;
-      filter: blur(2px);
-      transform: translate3d(0, 16px, 0) scale(0.995);
+      transform: translate3d(0, 14px, 0);
     }
     to {
       opacity: 1;
-      filter: blur(0);
-      transform: translate3d(0, 0, 0) scale(1);
+      transform: translate3d(0, 0, 0);
     }
   }
 
-  body.is-wheel-scrolling [data-reveal].is-visible {
-    transform: translateY(calc(var(--wheel-direction, 1) * -1px * var(--wheel-intensity, 0)));
-    transition-duration: 240ms;
-  }
+  /* The old rule here re-applied a transform to every revealed element on
+     the page while wheel-scrolling, forcing a full recomposite for a sub-pixel
+     shift. The hero console alone carries the wheel response now. */
 
   body.is-wheel-scrolling .hero-console {
     animation-play-state: paused;
@@ -341,30 +481,6 @@
   body.scrolling-down .project-card-3d.is-visible,
   body.scrolling-down .glass-panel.is-visible {
     transform-origin: bottom center;
-  }
-
-  #top::before {
-    content: "";
-    position: absolute;
-    inset: 12% -18% auto auto;
-    width: 40rem;
-    height: 40rem;
-    border: 1px solid rgba(17, 17, 17, 0.08);
-    border-radius: 999px;
-    background: radial-gradient(circle, rgba(215, 255, 102, 0.18), transparent 58%);
-    animation: scroll-orbit 18s linear infinite;
-  }
-
-  #top::after {
-    content: "";
-    position: absolute;
-    left: -18%;
-    bottom: 8%;
-    width: 30rem;
-    height: 30rem;
-    border: 1px solid rgba(17, 17, 17, 0.08);
-    border-radius: 999px;
-    animation: scroll-orbit 24s linear infinite reverse;
   }
 
   .glass-panel {
@@ -391,9 +507,15 @@
     transform: translateX(120%);
   }
 
+  /* position/overflow are required, not cosmetic: the ::before shimmer below
+     is absolutely positioned, so without a positioned, clipping parent it
+     resolved against a distant ancestor and painted diagonal light bands
+     across the whole section. */
   .hover-tilt,
   .project-card-3d,
   .cert-card {
+    position: relative;
+    overflow: hidden;
     transform-style: preserve-3d;
     transition: transform 220ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 220ms ease, border-color 220ms ease;
   }
@@ -430,7 +552,7 @@
     animation: token-drift 4.5s ease-in-out infinite;
   }
 
-  body:not(.is-page-loaded) .floating-token {
+  .js body:not(.is-page-loaded) .floating-token {
     opacity: 0;
     transform: translateY(12px) scale(0.92);
   }
@@ -503,21 +625,11 @@
     }
   }
 
-  @keyframes scroll-orbit {
-    from {
-      transform: rotate(0deg) translateX(18px) rotate(0deg);
-    }
-    to {
-      transform: rotate(360deg) translateX(18px) rotate(-360deg);
-    }
-  }
 
   @media (prefers-reduced-motion: reduce) {
     .hero-console,
     .floating-token,
-    .project-visual::after,
-    #top::before,
-    #top::after {
+    .project-visual::after {
       animation: none;
     }
 
@@ -543,5 +655,110 @@
     body.is-wheel-scrolling .hero-console {
       transform: none;
     }
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Print. Recruiters do print portfolios, and the screen design (fixed header,
+   dark contact panel, canvas/WebGL scenes, entrance animations) prints badly.
+   This strips the page down to the content and its structure.
+   ------------------------------------------------------------------------- */
+@media print {
+  @page {
+    margin: 16mm 14mm;
+  }
+
+  html {
+    font-size: 11pt;
+  }
+
+  body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+
+  /* Chrome and Firefox both need this to keep hairline rules visible. */
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    box-shadow: none !important;
+    text-shadow: none !important;
+    filter: none !important;
+    backdrop-filter: none !important;
+  }
+
+  /* Screen-only furniture. */
+  .site-header,
+  canvas,
+  .noise-overlay::after,
+  .hero-console,
+  .floating-token,
+  .project-visual,
+  [data-parallax],
+  .skip-link {
+    display: none !important;
+  }
+
+  /* Entrance states must never hide content on paper. */
+  .js [data-reveal],
+  [data-reveal] {
+    opacity: 1 !important;
+    filter: none !important;
+    transform: none !important;
+    animation: none !important;
+  }
+
+  main > section::after {
+    display: none !important;
+  }
+
+  section {
+    padding-block: 0.6rem !important;
+    break-inside: avoid;
+  }
+
+  h1 {
+    font-size: 20pt !important;
+  }
+
+  h2 {
+    font-size: 14pt !important;
+    break-after: avoid;
+  }
+
+  h3 {
+    font-size: 12pt !important;
+    break-after: avoid;
+  }
+
+  article,
+  li {
+    break-inside: avoid;
+  }
+
+  /* Invert the dark contact panel so it does not print as a solid black box. */
+  #contact .bg-foreground {
+    background: #fff !important;
+    color: #000 !important;
+    border: 1px solid #000 !important;
+  }
+
+  #contact .text-background,
+  #contact .text-background\/70,
+  #contact .text-background\/60,
+  #contact .text-background\/50 {
+    color: #000 !important;
+  }
+
+  /* Print the destination of outbound links; in-page anchors add no value. */
+  a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 8pt;
+    word-break: break-all;
+  }
+
+  a[href^="#"]::after,
+  a[href^="/"]::after {
+    content: "";
   }
 }
