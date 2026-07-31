@@ -1,26 +1,39 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { useState } from "react";
+import type { FormEvent } from "react";
+
 import { Button } from "@/components/ui/button";
+import { trackInteraction } from "@/lib/analytics";
+
+const SUGGESTED = [
+  "What is Aryan's cloud experience?",
+  "How does KANOON work?",
+  "What RAG experience does he have?",
+  "Why should we hire him?",
+];
+
+const INTRO =
+  "Ask about Aryan's experience, projects, skills, or education and I'll answer straight from his resume. Try one of the questions below.";
 
 export function InteractiveAI() {
   const [query, setQuery] = useState("");
   const [history, setHistory] = useState<Array<{ sender: "user" | "assistant"; text: string }>>([
-    {
-      sender: "assistant",
-      text: "Ask any question about Aryan's work or projects. This portfolio chatbot uses Aryan's portfolio context to generate concise answers.",
-    },
+    { sender: "assistant", text: INTRO },
   ]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const submitQuery = async (prompt: string) => {
     const trimmed = prompt.trim();
-    if (!trimmed) return;
+    if (!trimmed || loading) return;
+
     setError(null);
     setHistory((cur) => [...cur, { sender: "user", text: trimmed }]);
     setQuery("");
     setLoading(true);
+    trackInteraction("assistant_question", { question: trimmed.slice(0, 100) });
+
     try {
       const res = await fetch("/api/ai", {
         method: "POST",
@@ -28,67 +41,98 @@ export function InteractiveAI() {
         body: JSON.stringify({ prompt: trimmed }),
       });
       const data = await res.json();
+
       if (!res.ok) {
-        setError(data.error || "AI error");
-        setHistory((cur) => [...cur, { sender: "assistant", text: data.error || "AI error" }]);
+        const message = data.error || "Something went wrong. Please try again.";
+        setError(message);
+        setHistory((cur) => [...cur, { sender: "assistant", text: message }]);
       } else {
-        setHistory((cur) => [...cur, { sender: "assistant", text: data.reply || "No reply" }]);
+        setHistory((cur) => [
+          ...cur,
+          { sender: "assistant", text: data.reply || "No answer available." },
+        ]);
       }
-    } catch (err) {
-      const msg = String(err);
-      setError(msg);
-      setHistory((cur) => [...cur, { sender: "assistant", text: msg }]);
+    } catch {
+      const message = "Could not reach the assistant. Check your connection and try again.";
+      setError(message);
+      setHistory((cur) => [...cur, { sender: "assistant", text: message }]);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = (event: FormEvent) => {
+    event.preventDefault();
     submitQuery(query);
   };
 
   return (
-    <div className="rounded-[2rem] border border-foreground/10 bg-card/90 p-6 shadow-[0_28px_90px_rgba(17,17,17,0.12)]">
+    <div className="rounded-none border border-foreground/10 bg-card/90 p-6 shadow-card">
       <div className="mb-6">
-        <p className="font-mono text-sm font-semibold uppercase tracking-[0.18em] text-muted-foreground">Interactive AI features</p>
-        <h3 className="mt-4 text-3xl font-semibold tracking-tight">Resume Chat + Project Q&A</h3>
+        <p className="font-mono text-sm font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+          Portfolio assistant
+        </p>
+        <h3 className="mt-4 text-3xl font-semibold tracking-tight">Ask about my work</h3>
         <p className="mt-3 text-sm leading-6 text-muted-foreground">
-          Ask any question and receive a generated answer using Aryan's portfolio context.
+          Instant answers sourced directly from my resume — experience, projects, stack,
+          and contact details.
         </p>
       </div>
 
-      <div className="mb-4 flex flex-wrap gap-3">
-        <Button onClick={() => submitQuery("Tell me about Aryan's cloud experience")} variant="outline" size="sm" className="rounded-3xl">
-          Tell me about Aryan's cloud experience
-        </Button>
-        <Button onClick={() => submitQuery("How does Kanoon work?")} variant="outline" size="sm" className="rounded-3xl">
-          How does Kanoon work?
-        </Button>
+      <div className="mb-4 flex flex-wrap gap-2">
+        {SUGGESTED.map((suggestion) => (
+          <Button
+            key={suggestion}
+            onClick={() => submitQuery(suggestion)}
+            disabled={loading}
+            variant="outline"
+            size="sm"
+            className="rounded-none"
+          >
+            {suggestion}
+          </Button>
+        ))}
       </div>
 
-      <div className="mb-4 max-h-[320px] space-y-4 overflow-y-auto rounded-[1.75rem] border border-foreground/10 bg-background/80 p-5 text-sm text-muted-foreground shadow-inner">
-        {history.map((message, idx) => (
-          <div key={idx} className="space-y-2">
-            <p className="text-xs uppercase tracking-[0.16em] text-muted-foreground">{message.sender === "user" ? "You" : "Assistant"}</p>
-            <div className={`break-words rounded-3xl p-4 ${message.sender === "assistant" ? "bg-slate-950/70 text-slate-100" : "bg-background/90 text-foreground"}`}>
+      <div
+        className="mb-4 max-h-[320px] space-y-4 overflow-y-auto rounded-none border border-foreground/10 bg-background/80 p-5 text-sm text-muted-foreground shadow-inner"
+        aria-live="polite"
+      >
+        {history.map((message, index) => (
+          <div key={index} className="space-y-2">
+            <p className="text-xs uppercase tracking-[0.16em] text-muted-foreground">
+              {message.sender === "user" ? "You" : "Assistant"}
+            </p>
+            <div
+              className={`whitespace-pre-line break-words rounded-none p-4 ${
+                message.sender === "assistant"
+                  ? "bg-foreground text-background"
+                  : "bg-background/90 text-foreground"
+              }`}
+            >
               {message.text}
             </div>
           </div>
         ))}
-        {loading && <div className="text-sm italic text-muted-foreground">Thinking...</div>}
+        {loading && <div className="text-sm italic text-muted-foreground">Looking that up...</div>}
       </div>
 
-      {error && <div className="mb-3 text-sm text-destructive">{error}</div>}
+      {error && (
+        <div role="alert" className="mb-3 text-sm text-destructive">
+          {error}
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="grid gap-3 sm:grid-cols-[1fr_auto]">
         <input
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={(event) => setQuery(event.target.value)}
           placeholder="Ask a question..."
-          className="w-full break-words rounded-3xl border border-foreground/10 bg-background/80 px-4 py-3 text-sm text-foreground outline-none transition focus:border-foreground/60 focus:ring-2 focus:ring-foreground/10"
+          maxLength={600}
+          aria-label="Ask a question about Aryan's work"
+          className="w-full break-words rounded-none border border-foreground/10 bg-background/80 px-4 py-3 text-sm text-foreground outline-none transition focus:border-foreground/60 focus:ring-2 focus:ring-foreground/10"
         />
-        <Button type="submit" size="lg" className="rounded-3xl" disabled={loading}>
+        <Button type="submit" size="lg" className="rounded-none" disabled={loading || !query.trim()}>
           {loading ? "..." : "Ask"}
         </Button>
       </form>
