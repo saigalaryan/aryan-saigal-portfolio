@@ -11,16 +11,29 @@ export function ScrollEffects() {
       document.body.classList.add("is-page-loaded");
     });
 
+    // Reveal is opt-out, not opt-in: `.js [data-reveal]` is opacity 0, so
+    // anything this module fails to mark visible is invisible for good. That
+    // failure mode blanks whole sections, so `reveal` is the only place the
+    // class is set and the sweep below backstops the observer.
+    const reveal = (item: Element) => {
+      if (item.classList.contains("is-visible")) return;
+      item.classList.add("is-visible");
+      // will-change pins a compositor layer for as long as it is set.
+      // Release it once the reveal has played and stop observing, so
+      // dozens of layers are not kept alive for the whole session.
+      (item as HTMLElement).style.willChange = "auto";
+      observer.unobserve(item);
+    };
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.intersectionRatio < 0.1) return;
-          entry.target.classList.add("is-visible");
-          // will-change pins a compositor layer for as long as it is set.
-          // Release it once the reveal has played and stop observing, so
-          // dozens of layers are not kept alive for the whole session.
-          (entry.target as HTMLElement).style.willChange = "auto";
-          observer.unobserve(entry.target);
+          // `isIntersecting`, not a ratio floor. With threshold 0 the callback
+          // only fires as an element crosses the root edge, where the ratio is
+          // still ~0, so a `ratio < 0.1` guard rejected the one callback the
+          // element would ever get and left it stuck at opacity 0 for good.
+          if (!entry.isIntersecting) return;
+          reveal(entry.target);
         });
       },
       // A full viewport of lead time in each direction. The reveal then
@@ -37,9 +50,37 @@ export function ScrollEffects() {
       observer.observe(item);
     });
 
+    // Backstop. Anything sitting in the viewport should already have been
+    // revealed by the observer, so this sweep is a no-op when the observer is
+    // healthy. If it ever finds work to do the observer is not delivering, and
+    // the page would otherwise render as blank space, so keep sweeping on
+    // scroll for the rest of the session rather than trusting it again.
+    let sweepOnScroll = false;
+
+    const sweep = () => {
+      let rescued = 0;
+      for (const item of revealItems) {
+        if (item.classList.contains("is-visible")) continue;
+        const rect = item.getBoundingClientRect();
+        // Same lead time as the observer's rootMargin.
+        if (rect.top > window.innerHeight + 900 || rect.bottom < -900) continue;
+        reveal(item);
+        rescued += 1;
+      }
+      if (rescued > 0) sweepOnScroll = true;
+    };
+
+    const sweepTimer = window.setTimeout(sweep, 1200);
+    const onScrollSweep = () => {
+      if (sweepOnScroll) sweep();
+    };
+    window.addEventListener("scroll", onScrollSweep, { passive: true });
+
     if (reduceMotion) {
       return () => {
         observer.disconnect();
+        window.clearTimeout(sweepTimer);
+        window.removeEventListener("scroll", onScrollSweep);
         window.cancelAnimationFrame(loadFrame);
       };
     }
@@ -126,6 +167,8 @@ export function ScrollEffects() {
 
     return () => {
       observer.disconnect();
+      window.clearTimeout(sweepTimer);
+      window.removeEventListener("scroll", onScrollSweep);
       window.removeEventListener("scroll", schedule);
       window.removeEventListener("wheel", onWheel);
       if (frame) window.cancelAnimationFrame(frame);
