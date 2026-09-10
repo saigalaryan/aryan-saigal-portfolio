@@ -2,7 +2,15 @@ import { describe, expect, it } from "vitest";
 
 import { getProject, projects } from "@/lib/projects";
 
-const ICON_NAMES = ["BrainCircuit", "Database", "Mic", "ShieldCheck", "Network", "Code2"];
+const ICON_NAMES = [
+  "BrainCircuit",
+  "Database",
+  "Mic",
+  "ShieldCheck",
+  "Network",
+  "Code2",
+  "CircleDollarSign",
+];
 
 describe("projects data", () => {
   it("has at least one project", () => {

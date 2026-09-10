@@ -5,6 +5,7 @@ import {
   ArrowLeft,
   ArrowUpRight,
   BrainCircuit,
+  CircleDollarSign,
   Code2,
   Database,
   Github,
@@ -21,6 +22,7 @@ import { getProject, projects, type Project } from "@/lib/projects";
 
 const ICONS = {
   BrainCircuit,
+  CircleDollarSign,
   Database,
   Mic,
   ShieldCheck,

@@ -3,8 +3,8 @@
  *
  * This runs with no API key and no external request: a question is scored
  * against each entry's keywords and the best match is returned verbatim.
- * Every answer is hand-written from the resume, so nothing here is generated
- * or inferred at runtime.
+ * Every answer is hand-written from the resume or the project's own
+ * repository, so nothing here is generated or inferred at runtime.
  */
 
 export type KnowledgeEntry = {
@@ -125,7 +125,19 @@ export const knowledgeBase: KnowledgeEntry[] = [
       "claude", "multimodal", "multi-modal",
     ],
     answer:
-      "Aryan works with the Model Context Protocol to extend AI systems with external tools.\n\nAt EMB Global he integrated MCP servers for multi-modal AI generation across production services. In ConversAge AI, MCP integration adds five capabilities behind one chat interface: blog generation, image creation, video generation, a marketing campaign generator, and live web search.\n\nHe has completed 8 Anthropic AI courses alongside project delivery, including Building with the Claude API, Model Context Protocol: Advanced Topics, Introduction to Model Context Protocol, AI Fluency: Framework & Foundations, Introduction to Agent Skills, and AI Capabilities and Limitations.",
+      "Aryan works with the Model Context Protocol to extend AI systems with external tools, and builds tooling for the agents themselves.\n\nAgent Cost Profiler is a LangGraph profiler that renders a run as a flame graph where width is spend, so the node consuming the budget is visible immediately, with what-if re-pricing and CI cost budgets on top.\n\nAt EMB Global he integrated MCP servers for multi-modal AI generation across production services. In ConversAge AI, MCP integration adds five capabilities behind one chat interface: blog generation, image creation, video generation, a marketing campaign generator, and live web search.\n\nHe has completed 8 Anthropic AI courses alongside project delivery, including Building with the Claude API, Model Context Protocol: Advanced Topics, Introduction to Model Context Protocol, AI Fluency: Framework & Foundations, Introduction to Agent Skills, and AI Capabilities and Limitations.",
+  },
+  {
+    id: "agent-cost-profiler",
+    question: "What is the Agent Cost Profiler?",
+    keywords: [
+      "agent cost", "cost profiler", "profiler", "profiling", "flame graph",
+      "flamegraph", "icicle", "langgraph", "spend", "token cost", "cost drift",
+      "what-if pricing", "budget", "observability", "span", "tracing",
+      "d3", "how much does it cost",
+    ],
+    answer:
+      "Agent Cost Profiler is a cost and performance profiler for LangGraph agents, built with Python, FastAPI, SQLite, React, TypeScript, Vite, and d3-hierarchy.\n\nA CostProfiler callback is passed to graph.invoke, so no agent code changes. Each node emits a span with timings and per-type token counts; spans post to a FastAPI collector that stores them in SQLite and pins pricing at ingest time. The run is then drawn as an icicle flame graph where width encodes the metric being examined — cost, tokens, or latency, switchable on the same run.\n\nTwo accuracy details matter: self time is total duration minus the union (not the sum) of child intervals, so concurrent tool calls are not double counted; and unpriced models display as \"unpriced\" rather than $0.00, since a silent zero understates real spend.\n\nIt also tracks per-node spend across runs to expose cost drift, compares two runs, re-prices a captured run against another model without re-running it, checks whether prompt caching is a net saving, and fails CI builds over a cost budget. The profiler never breaks the agent it measures: seconds-long timeouts, a circuit breaker after three failures, and background threads for streaming.\n\nRepo: github.com/saigalaryan/agent-cost-profiler",
   },
   {
     id: "experience",
@@ -148,7 +160,7 @@ export const knowledgeBase: KnowledgeEntry[] = [
       "backend", "full stack", "full-stack",
     ],
     answer:
-      "AI / ML: LangChain, RAG pipelines, ChromaDB, OpenRouter, MCP servers, LlamaParse, Docling, spaCy, NLTK, XGBoost, MLflow, generative AI, prompt and agent design.\n\nBackend: Python, FastAPI, Node.js, REST APIs, SQL, PostgreSQL, SQLite, Supabase.\n\nFrontend: Next.js 14, React 18, JavaScript, HTML5, CSS3, Tailwind CSS.\n\nCloud & DevOps: GCP Cloud Run, AWS, Docker, GitHub Actions CI/CD, Vercel, Cloudflare Workers.\n\nData & Analytics: Pandas, NumPy, Matplotlib, Seaborn, Power BI, Excel.\n\nSecurity & Networking: cybersecurity fundamentals, IAM policy review, TCP/IP, IPv4, routing.",
+      "AI / ML: LangChain, LangGraph, RAG pipelines, ChromaDB, OpenRouter, MCP servers, LlamaParse, Docling, spaCy, NLTK, XGBoost, MLflow, generative AI, prompt and agent design.\n\nBackend: Python, FastAPI, Node.js, REST APIs, SQL, PostgreSQL, SQLite, Supabase.\n\nFrontend: Next.js 14, React 18, JavaScript, HTML5, CSS3, Tailwind CSS.\n\nCloud & DevOps: GCP Cloud Run, AWS, Docker, GitHub Actions CI/CD, Vercel, Cloudflare Workers.\n\nData & Analytics: Pandas, NumPy, Matplotlib, Seaborn, Power BI, Excel.\n\nSecurity & Networking: cybersecurity fundamentals, IAM policy review, TCP/IP, IPv4, routing.",
   },
   {
     id: "education",
@@ -179,7 +191,7 @@ export const knowledgeBase: KnowledgeEntry[] = [
       "repository", "work samples", "what has he made",
     ],
     answer:
-      "Seven shipped projects, each with a full case study on this site covering the problem, how the system works step by step, and why the stack was chosen:\n\n1. ConversAge AI - RAG marketing and content suite with five MCP capabilities. /projects/conversage-ai\n2. OCR Multi-Model Parser Platform - four selectable OCR engines with page-level extraction. /projects/ocr-parser-platform\n3. AI Web Interview Platform - real-time voice interviewer with WebRTC proctoring. /projects/ai-interview-platform\n4. KANOON - legal decision support with RAG across 11 Indian languages. /projects/kanoon\n5. Text-to-SQL Chatbot - schema-aware natural language to validated SQL. /projects/text-to-sql-chatbot\n6. Customer Churn MLOps Pipeline - XGBoost with MLflow and automated AWS retraining. /projects/customer-churn-mlops\n7. Local AI Coding Assistant - fully on-device Ollama and Qwen2.5-Coder. /projects/local-ai-coding-assistant\n\nAll source is on GitHub: github.com/saigalaryan",
+      "Eight shipped projects, each with a full case study on this site covering the problem, how the system works step by step, and why the stack was chosen:\n\n1. Agent Cost Profiler - flame-graph cost profiling for LangGraph agents. /projects/agent-cost-profiler\n2. ConversAge AI - RAG marketing and content suite with five MCP capabilities. /projects/conversage-ai\n3. OCR Multi-Model Parser Platform - four selectable OCR engines with page-level extraction. /projects/ocr-parser-platform\n4. AI Web Interview Platform - real-time voice interviewer with WebRTC proctoring. /projects/ai-interview-platform\n5. KANOON - legal decision support with RAG across 11 Indian languages. /projects/kanoon\n6. Text-to-SQL Chatbot - schema-aware natural language to validated SQL. /projects/text-to-sql-chatbot\n7. Customer Churn MLOps Pipeline - XGBoost with MLflow and automated AWS retraining. /projects/customer-churn-mlops\n8. Local AI Coding Assistant - fully on-device Ollama and Qwen2.5-Coder. /projects/local-ai-coding-assistant\n\nAll source is on GitHub: github.com/saigalaryan",
   },
   {
     id: "case-studies",
@@ -192,7 +204,7 @@ export const knowledgeBase: KnowledgeEntry[] = [
       "architecture", "how it works", "walkthrough",
     ],
     answer:
-      "Every project has a case study on this site. Each one covers the problem it solves, a step-by-step walkthrough of how a request moves through the system, why each technology was chosen, and the headline outcomes.\n\n· /projects/conversage-ai\n· /projects/ocr-parser-platform\n· /projects/ai-interview-platform\n· /projects/kanoon\n· /projects/text-to-sql-chatbot\n· /projects/customer-churn-mlops\n· /projects/local-ai-coding-assistant",
+      "Every project has a case study on this site. Each one covers the problem it solves, a step-by-step walkthrough of how a request moves through the system, why each technology was chosen, and the headline outcomes.\n\n· /projects/agent-cost-profiler\n· /projects/conversage-ai\n· /projects/ocr-parser-platform\n· /projects/ai-interview-platform\n· /projects/kanoon\n· /projects/text-to-sql-chatbot\n· /projects/customer-churn-mlops\n· /projects/local-ai-coding-assistant",
   },
   {
     id: "local-ai",
@@ -263,7 +275,7 @@ const STOP_WORDS = new Set([
 const FALLBACK_ANSWER =
   "I answer from Aryan's resume, so I can only cover what is on it. Try asking about:\n\n" +
   "· His experience, current role, or a specific internship\n" +
-  "· A project by name: ConversAge AI, OCR Parser, KANOON, Text-to-SQL, AI Interview Platform, Churn Pipeline, Local Coding Assistant\n" +
+  "· A project by name: Agent Cost Profiler, ConversAge AI, OCR Parser, KANOON, Text-to-SQL, AI Interview Platform, Churn Pipeline, Local Coding Assistant\n" +
   "· A topic: RAG, MCP and agents, cloud and DevOps, MLOps, security\n" +
   "· Skills, education, certifications, or contact details";
 

@@ -102,11 +102,13 @@ const personJsonLd = {
   knowsAbout: [
     'Retrieval-Augmented Generation',
     'LangChain',
+    'LangGraph',
     'Model Context Protocol',
     'FastAPI',
     'Next.js',
     'GCP Cloud Run',
     'MLOps',
+    'LLM cost observability',
     'Text-to-SQL',
   ],
   alumniOf: {

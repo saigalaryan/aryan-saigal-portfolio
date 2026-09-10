@@ -6,7 +6,12 @@ import type { FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { trackInteraction } from "@/lib/analytics";
 
+// Each entry must match a knowledge-base topic, so the wording is copied from
+// that entry's `question` field rather than paraphrased: the matcher scores
+// against keywords, and a reworded chip can silently fall through to the
+// generic fallback answer.
 const SUGGESTED = [
+  "What is the Agent Cost Profiler?",
   "What is Aryan's cloud experience?",
   "How does KANOON work?",
   "What RAG experience does he have?",

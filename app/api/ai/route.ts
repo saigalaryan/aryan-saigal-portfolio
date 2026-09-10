@@ -32,8 +32,8 @@ Experience:
 - Social Media & Content Intern, The Cocoa Counter, New Delhi, May 2024 - Jun 2024.
 
 Skills:
-- AI/ML: LangChain, RAG pipelines, ChromaDB, OpenRouter, MCP servers, LlamaParse, Docling,
-  spaCy, NLTK, XGBoost, MLflow, generative AI, prompt and agent design.
+- AI/ML: LangChain, LangGraph, RAG pipelines, ChromaDB, OpenRouter, MCP servers, LlamaParse,
+  Docling, spaCy, NLTK, XGBoost, MLflow, generative AI, prompt and agent design.
 - Backend: Python, FastAPI, Node.js, REST APIs, SQL, PostgreSQL, SQLite, Supabase.
 - Frontend: Next.js 14, React 18, JavaScript, HTML5, CSS3, Tailwind CSS.
 - Cloud/DevOps: GCP Cloud Run, AWS, Docker, GitHub Actions CI/CD, Vercel, Cloudflare Workers.
@@ -41,6 +41,14 @@ Skills:
 - Security/Networking: cybersecurity fundamentals, IAM policy review, TCP/IP, IPv4, routing.
 
 Projects:
+- Agent Cost Profiler (LangGraph cost and performance profiling): a CostProfiler callback passed
+  to graph.invoke captures a span per node; a FastAPI collector stores them in SQLite with pricing
+  pinned at ingest, and a React/d3-hierarchy icicle flame graph renders the run with width encoding
+  cost, tokens, or latency. Self time is total minus the union of child intervals so concurrent
+  tool calls are not double counted, and unpriced models show as "unpriced" rather than $0.00.
+  Also does cross-run cost drift, run comparison, what-if re-pricing against other models, cache
+  analysis, and CI cost budgets. Never fails the measured agent: timeouts, a circuit breaker after
+  three failures, background-thread streaming.
 - ConversAge AI (RAG marketing and content suite): LangChain + ChromaDB RAG over PDF/DOC/PPT,
   five MCP capabilities (blog, image, video, campaign generator, web search), JWT auth,
   Vercel frontend and Cloudflare Workers backend.
@@ -185,7 +193,11 @@ export async function POST(req: Request) {
         // Kept server-side only: upstream bodies can echo request details.
         lastError = `${model} -> ${res.status} ${await res.text()}`;
 
-        if ([429, 500, 502, 503, 504].includes(res.status)) {
+        // 404/400 mean this model id is not available to this key, which is
+        // exactly what the rest of the list is for. Treating them as fatal
+        // made the first entry a single point of failure: one unrecognised
+        // model id skipped every fallback and dropped straight to local.
+        if ([400, 403, 404, 429, 500, 502, 503, 504].includes(res.status)) {
           continue;
         }
 

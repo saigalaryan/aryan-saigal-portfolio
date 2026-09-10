@@ -4,6 +4,7 @@ import {
   BadgeCheck,
   BrainCircuit,
   BriefcaseBusiness,
+  CircleDollarSign,
   Cloud,
   Code2,
   Database,
@@ -34,6 +35,7 @@ import { projects } from "@/lib/projects";
 // the case-study route), so the icon name is resolved here.
 const PROJECT_ICONS = {
   BrainCircuit,
+  CircleDollarSign,
   Database,
   Mic,
   ShieldCheck,
@@ -135,6 +137,7 @@ const experience = [
 
 const skills = [
   "LangChain",
+  "LangGraph",
   "FastAPI",
   "Next.js",
   "React",
@@ -157,6 +160,7 @@ const skillGroups = [
     category: "AI / ML",
     items: [
       "LangChain",
+      "LangGraph",
       "RAG pipelines",
       "ChromaDB",
       "OpenRouter",
@@ -421,7 +425,7 @@ export default function Home() {
           <div className="mt-10 grid gap-px border border-foreground/10 bg-foreground/10 sm:grid-cols-2">
             {[
               { value: "4", label: "Internships", detail: "AI, ML, cloud, and content" },
-              { value: "7", label: "Shipped projects", detail: "RAG, OCR, voice AI, MLOps" },
+              { value: "8", label: "Shipped projects", detail: "RAG, agents, OCR, MLOps" },
               { value: "11", label: "Indian languages", detail: "Legal retrieval in KANOON" },
               { value: "9", label: "Certifications", detail: "AWS, Anthropic, Cisco" },
             ].map((metric) => (

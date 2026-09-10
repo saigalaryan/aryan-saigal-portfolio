@@ -2,7 +2,8 @@
  * Single source of truth for project data.
  *
  * Consumed by the portfolio page (cards) and by /projects/[slug] (case
- * studies). Every field is drawn from the resume; nothing here is inferred.
+ * studies). Every field is drawn from the resume or the project's own
+ * repository; nothing here is inferred.
  */
 
 export type Project = {
@@ -16,7 +17,14 @@ export type Project = {
   repo: string;
   href: string;
   /** Lucide icon name, resolved by the consumer to avoid importing icons here. */
-  icon: "BrainCircuit" | "Database" | "Mic" | "ShieldCheck" | "Network" | "Code2";
+  icon:
+    | "BrainCircuit"
+    | "Database"
+    | "Mic"
+    | "ShieldCheck"
+    | "Network"
+    | "Code2"
+    | "CircleDollarSign";
   stack: string;
   stackList: string[];
   summary: string;
@@ -34,6 +42,94 @@ export type Project = {
 };
 
 export const projects: Project[] = [
+  {
+    slug: "agent-cost-profiler",
+    domain: "COST PROFILING",
+    title: "Agent Cost Profiler - LangGraph Spend Analysis",
+    tagline: "Flame graphs for LLM agent spend",
+    repo: "agent-cost-profiler",
+    href: "https://github.com/saigalaryan/agent-cost-profiler",
+    icon: "CircleDollarSign",
+    stack: "Python, FastAPI, SQLite, React, TypeScript, Vite, d3-hierarchy",
+    stackList: [
+      "Python 3.11+",
+      "FastAPI",
+      "SQLite",
+      "LangGraph",
+      "React",
+      "TypeScript",
+      "Vite",
+      "d3-hierarchy",
+      "uv",
+      "just",
+    ],
+    summary:
+      "Profiler that attaches to a LangGraph run as a callback and renders its span tree as an icicle flame graph where width is spend, so the node that ate the budget is obvious at a glance.",
+    highlights: [
+      "One flame graph switchable between cost, tokens, and latency, with per-node tables, run comparison, and what-if re-pricing against other models without re-running the agent",
+      "Fails CI builds over a cost budget, and never fails the agent it measures: seconds-long timeouts, a circuit breaker after three failures, and background-thread streaming",
+    ],
+    flow: [
+      { step: "Attach", detail: "CostProfiler is passed as a callback to graph.invoke, so the agent under test needs no code changes." },
+      { step: "Capture", detail: "Each LangGraph node emits a span carrying its timings and per-type token counts." },
+      { step: "Ingest", detail: "Spans post to the FastAPI collector, which writes them to SQLite and pins pricing at ingest time." },
+      { step: "Repair", detail: "The span tree is validated before it is drawn: cycles are rejected, orphans are reparented to a synthetic root, and every repair is logged as a warning." },
+      { step: "Attribute", detail: "Self time is computed as total duration minus the union of child intervals, so concurrent tool calls are not double counted." },
+      { step: "Render", detail: "d3-hierarchy lays out an icicle chart in React where width encodes the selected metric: cost, tokens, or latency." },
+      { step: "Compare", detail: "Runs are diffed against earlier ones to surface cost drift, and re-priced against alternative models without re-execution." },
+    ],
+    stackRationale: [
+      { tech: "LangGraph callbacks", role: "The hook point: profiling attaches to an existing graph invocation rather than wrapping it." },
+      { tech: "FastAPI", role: "Collector receiving spans during and after a run." },
+      { tech: "SQLite", role: "Local run store, which is the right scope for a developer tool rather than a hosted service." },
+      { tech: "React + TypeScript", role: "Interface hosting the flame graph and the per-node performance tables." },
+      { tech: "d3-hierarchy", role: "Computes the icicle layout the flame graph is drawn from." },
+      { tech: "Vite", role: "Frontend dev server and build." },
+      { tech: "uv + just", role: "One-command install and dev startup for a two-service local stack." },
+    ],
+    caseStudy: {
+      context:
+        "Agent frameworks make it easy to add a node and hard to know what that node costs. Usage arrives as one token total per run, so a summarizer quietly consuming most of the budget looks identical to a cheap one. The question this tool answers is the one a flat metric cannot: which node ate the money?",
+      sections: [
+        {
+          heading: "Width is spend",
+          body: [
+            "A LangGraph execution is a tree, so it renders as one: d3-hierarchy lays the span tree out as an icicle chart in which the width of every node is the metric being examined.",
+            "Cost, token usage, and latency are the same picture viewed three ways, switchable on one run with a single click. Reading a flame graph needs no interpretation step — the widest band is the expensive one — and per-node tables sit beneath it for exact figures. An ASCII rendering is available for terminal use.",
+          ],
+        },
+        {
+          heading: "Getting the numbers right",
+          body: [
+            "Two accounting details decide whether a profiler is trustworthy. The first is self time versus total time: total is wall clock including children, self is total minus the union — not the sum — of child intervals, which is what stops concurrent tool calls producing inflated or negative attribution.",
+            "The second is token accounting. Providers report input, cache reads, cache writes, output, and reasoning tokens separately because they are priced very differently, so the profiler tracks them as distinct categories rather than as one total.",
+            "Pricing follows the same principle: unknown is not zero. An unpriced model displays as “unpriced” rather than $0.00, since a silent zero understates what a run actually cost. Rates carry updated_at timestamps and source URLs so any figure can be checked.",
+          ],
+        },
+        {
+          heading: "Never break what you measure",
+          body: [
+            "An observability tool that can take down the agent it observes is worse than no tool. Every network call times out within seconds, a circuit breaker trips after three consecutive failures, and streaming modes push work onto background threads.",
+            "Killing the collector mid-run produces warnings, not a crash. Malformed span trees are repaired rather than rejected outright: cycles are refused, orphaned spans are reparented to a synthetic root, and the repairs are reported.",
+          ],
+        },
+        {
+          heading: "Beyond a single run",
+          body: [
+            "Per-node spend is tracked across runs so cost drift shows up as a trend rather than a surprise, and any two runs can be compared directly. What-if pricing re-costs a captured run against a different model without re-executing it, which turns model selection into a lookup instead of an experiment. Cache analysis answers the related question of whether prompt caching is a net saving or a net loss.",
+            "The same budgets run in CI: a build fails when a run exceeds its cost ceiling. Ingest of 2,000 spans takes 128ms and full tree retrieval 71ms, so the collector stays out of the way during development.",
+          ],
+        },
+        {
+          heading: "Scope",
+          body: [
+            "The tool ships with a five-node example research agent that runs deliberately unbalanced — concurrent retriever and scanner nodes, a tool-calling loop with reranking, and a large-context summarizer accounting for 83% of the cost — so the flame graph has something real to show. It runs offline from a scripted transcript, or against live OpenRouter and OpenAI calls.",
+            "Scope is deliberately bounded to a local developer tool: no authentication, multi-tenancy, distributed tracing, OpenTelemetry export, or hosted deployment. Correctness is held in place by 240+ backend and 44+ frontend tests.",
+          ],
+        },
+      ],
+    },
+  },
   {
     slug: "conversage-ai",
     domain: "RAG",
